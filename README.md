@@ -1,2 +1,2 @@
 # RPC-GUI
-쉽게 설정이 가능한 discord rpc였던것
+https://drive.google.com/file/d/1mMOxZfjKIxw23aQhVNlJGwBuBpoenAzM/view?usp=sharing
