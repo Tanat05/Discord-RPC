@@ -2,7 +2,7 @@
 
 누구나 쉽게 사용가능한 Discord RPC입니다.
 
-[download](https://drive.google.com/file/d/14oS7MIGk5-VK6rcziUyhM5qCIwiqZt3i/view?usp=sharing)
+[Download](https://drive.google.com/file/d/14oS7MIGk5-VK6rcziUyhM5qCIwiqZt3i/view?usp=sharing)
 
 ![image](https://github.com/Tanat05/Discord-rpc-GUI/assets/85154556/956bd1fe-f152-49fd-9db3-61ba8d35d5fb)
 
