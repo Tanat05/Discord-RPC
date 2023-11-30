@@ -16,7 +16,7 @@ client_id*: [디스코드 디벨로퍼](https://discord.com/developers/applicati
 
 버튼1, 2 제목: 버튼에 나오는 문구 입력
 
-버튼1, 2 URL: 버튼을 눌렀을 때 이동할 사이트 URL 입
+버튼1, 2 URL: 버튼을 눌렀을 때 이동할 사이트 URL 입력
 
 *필수입력
 
