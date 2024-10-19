@@ -2,21 +2,26 @@ import sys
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                              QHBoxLayout, QLabel, QLineEdit, QComboBox, 
                              QPushButton, QMessageBox, QFormLayout, QSpacerItem, QSizePolicy)
-from PyQt5.QtGui import QFont, QColor, QPalette
+from PyQt5.QtGui import QFont, QFontDatabase
 from PyQt5.QtCore import Qt
 from pypresence import Presence
+import tempfile
 import os
 
 class TossStyleApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Discord RPC")
-        self.setFixedSize(400, 650)
+        self.setFixedSize(500, 650)
         self.setStyleSheet("""
+            * {
+                font-weight: bold;
+            }              
             QMainWindow {
                 background-color: #ffffff;
             }
             QLabel {
+                padding: 8px;
                 color: #333333;
                 font-size: 14px;
             }
@@ -24,8 +29,9 @@ class TossStyleApp(QMainWindow):
                 border: 1px solid #e1e1e1;
                 border-radius: 8px;
                 padding: 8px;
-                font-size: 14px;
+                font-size: 16px;
                 color: #333333;
+                font-weight: normal;
             }
             QLineEdit:focus {
                 border: 2px solid #3182f6;
@@ -36,9 +42,21 @@ class TossStyleApp(QMainWindow):
                 padding: 8px;
                 font-size: 14px;
                 color: #333333;
+                background-color: white;
             }
             QComboBox::drop-down {
-                border: 0px;
+                width: 40px;
+                border-top-right-radius: 8px;
+                border-bottom-right-radius: 8px;
+            }
+            QComboBox QAbstractItemView {
+                border: 2px solid #3182f6;
+                border-radius: 8px;
+                background-color: white;
+                selection-background-color: #3182f6;
+                selection-color: white;
+                padding: 5px;
+                font-weight: bold;
             }
             QPushButton {
                 background-color: #3182f6;
@@ -70,23 +88,42 @@ class TossStyleApp(QMainWindow):
         form_layout.setSpacing(10)
         main_layout.addLayout(form_layout)
 
-        self.fields = {
-            "Client ID": QLineEdit(),
-            "내용 1": QLineEdit(),
-            "내용 2": QLineEdit(),
-            "이미지 이름": QLineEdit(),
-            "이미지 내용": QLineEdit(),
-            "버튼1 제목": QLineEdit(),
-            "버튼1 URL": QLineEdit(),
-            "버튼2 제목": QLineEdit(),
-            "버튼2 URL": QLineEdit()
-        }
+        try:
+                with open(f"{tempfile.gettempdir()}\\discord_rpc.txt", 'r', encoding="utf-8") as f:
+                        line = f.readline().split(",")
+                        
+                self.fields = {
+                    "Client ID": QLineEdit(line[0]),
+                    "내용 1": QLineEdit(line[1]),
+                    "내용 2": QLineEdit(line[2]),
+                    "이미지 이름": QLineEdit(line[3]),
+                    "이미지 내용": QLineEdit(line[4]),
+                    "버튼1 제목": QLineEdit(line[6]),
+                    "버튼1 URL": QLineEdit(line[7]),
+                    "버튼2 제목": QLineEdit(line[8]),
+                    "버튼2 URL": QLineEdit(line[9])
+                }
+                button_count = int(line[5])
+        except:
+                self.fields = {
+                    "Client ID": QLineEdit(),
+                    "내용 1": QLineEdit(),
+                    "내용 2": QLineEdit(),
+                    "이미지 이름": QLineEdit(),
+                    "이미지 내용": QLineEdit(),
+                    "버튼1 제목": QLineEdit(),
+                    "버튼1 URL": QLineEdit(),
+                    "버튼2 제목": QLineEdit(),
+                    "버튼2 URL": QLineEdit()
+                }
+                button_count = 0
 
         for label, widget in self.fields.items():
             form_layout.addRow(QLabel(label), widget)
 
         self.button_count = QComboBox()
         self.button_count.addItems(["0", "1", "2"])
+        self.button_count.setCurrentIndex(button_count)
         form_layout.addRow(QLabel("버튼 개수"), self.button_count)
 
         main_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
@@ -134,14 +171,14 @@ class TossStyleApp(QMainWindow):
             return
 
         
-        with open("discord_rpc.txt", 'w', encoding="utf-8") as f:
+        with open(f"{tempfile.gettempdir()}\\discord_rpc.txt", 'w', encoding="utf-8") as f:
             f.write(f"{client_id},{state},{details},{large_image},{large_text},{button_count},{button_name1},{button_url1},{button_name2},{button_url2}")
 
         self.show_message("알림", "업데이트가 완료되었습니다")
 
     def start(self):
         try:
-            with open("discord_rpc.txt", 'r', encoding="utf-8") as f:
+            with open(f"{tempfile.gettempdir()}\\discord_rpc.txt", 'r', encoding="utf-8") as f:
                 line = f.readline().split(",")
 
             client_id = line[0]  # Fake ID, put your real one here
