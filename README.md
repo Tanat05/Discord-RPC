@@ -4,7 +4,8 @@
 
 [Download](https://drive.google.com/file/d/14oS7MIGk5-VK6rcziUyhM5qCIwiqZt3i/view?usp=sharing)
 
-![image](https://github.com/Tanat05/Discord-rpc-GUI/assets/85154556/956bd1fe-f152-49fd-9db3-61ba8d35d5fb)
+![image](https://github.com/user-attachments/assets/2c0b1b51-e2d6-4382-8fb1-83d976b50c0a)
+
 
 # 사용법
 
