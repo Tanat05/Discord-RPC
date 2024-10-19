@@ -1,12 +1,52 @@
 import sys
 from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
                              QHBoxLayout, QLabel, QLineEdit, QComboBox, 
-                             QPushButton, QMessageBox, QFormLayout, QSpacerItem, QSizePolicy)
+                             QPushButton, QMessageBox, QFormLayout, QSpacerItem, QSizePolicy,
+                             QDialog, QProgressBar)
 from PyQt5.QtGui import QFont, QFontDatabase
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QTimer
 from pypresence import Presence
 import tempfile
 import os
+import time
+
+class LoadingDialog(QDialog):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("로딩 중...")
+        self.setFixedSize(300, 100)
+        layout = QVBoxLayout(self)
+
+        self.progress_bar = QProgressBar(self)
+        self.progress_bar.setRange(0, 100)
+        layout.addWidget(self.progress_bar)
+
+        self.status_label = QLabel("초기화 중...", self)
+        self.status_label.setAlignment(Qt.AlignCenter)
+        layout.addWidget(self.status_label)
+
+        self.setStyleSheet("""
+            QDialog {
+                background-color: white;
+            }
+            QProgressBar {
+                border: 2px solid #3182f6;
+                border-radius: 5px;
+                text-align: center;
+            }
+            QProgressBar::chunk {
+                background-color: #3182f6;
+            }
+            QLabel {
+                color: #333333;
+                font-size: 14px;
+            }
+        """)
+
+    def update_progress(self, value, status):
+        self.progress_bar.setValue(value)
+        self.status_label.setText(status)
+
 
 class TossStyleApp(QMainWindow):
     def __init__(self):
@@ -178,43 +218,62 @@ class TossStyleApp(QMainWindow):
 
     def start(self):
         try:
+            loading_dialog = LoadingDialog(self)
+            loading_dialog.show()
+
+            def update_progress(value, status):
+                loading_dialog.update_progress(value, status)
+                QApplication.processEvents()
+
+            update_progress(0, "설정 파일 읽는 중...")
             with open(f"{tempfile.gettempdir()}\\discord_rpc.txt", 'r', encoding="utf-8") as f:
                 line = f.readline().split(",")
-                
-            client_id = self.fields["Client ID"].text()
-            state = self.fields["내용 2"].text()
-            details = self.fields["내용 1"].text()
-            large_image = self.fields["이미지 이름"].text()
-            large_text = self.fields["이미지 내용"].text()
-            button_count = int(self.button_count.currentText())
-            button_name1 = self.fields["버튼1 제목"].text()
-            button_url1 = self.fields["버튼1 URL"].text()
-            button_name2 = self.fields["버튼2 제목"].text()
-            button_url2 = self.fields["버튼2 URL"].text()
-            
-            if line[0] != client_id or line[1] != state or line[2] != details or line[3] != large_image or line[4] != large_text or line[5] != str(button_count) or line[6] != button_name1 or line[7] != button_url1 or line[8] != button_name2 or line[9] != button_url2:
-                self.show_warning("주의", "변경된 내용이 있습니다.\n저장하기를 해야 반영이 됩니다.")
 
+            update_progress(4, "Discord RPC 연결 중...")
+            time.sleep(0.1)
+            update_progress(16, "Discord RPC 연결 중...")
+            time.sleep(0.1)
+            update_progress(20, "Discord RPC 연결 중...")
             client_id = line[0]
             RPC = Presence(client_id)
             RPC.connect()
             
+            update_progress(30, "RPC 상태 업데이트 중...")
+            time.sleep(0.2)
+            update_progress(40, "RPC 상태 업데이트 중...")
+            time.sleep(0.3)
             if line[5] == '1':
+                update_progress(60, "RPC 상태 업데이트 중...")
+                time.sleep(0.1)
                 if line[3] == "":
-                    print(RPC.update(state=line[1], details=line[2], buttons=[{"label": line[6], "url": line[7]}]))
+                    update_progress(80, "RPC 상태 업데이트 중...")
+                    RPC.update(state=line[1], details=line[2], buttons=[{"label": line[6], "url": line[7]}])
                 else:
-                    print(RPC.update(state=line[1], details=line[2], large_image=line[3], large_text=line[4], buttons=[{"label": line[6], "url": line[7]}]))
+                    update_progress(80, "RPC 상태 업데이트 중...")
+                    RPC.update(state=line[1], details=line[2], large_image=line[3], large_text=line[4], buttons=[{"label": line[6], "url": line[7]}])
             elif line[5] == '2':
+                time.sleep(0.1)
+                update_progress(60, "RPC 상태 업데이트 중...")
                 if line[3] == "":
-                    print(RPC.update(state=line[1], details=line[2], buttons=[{"label": line[6], "url": line[7]}, {"label": line[8], "url": line[9]}]))
+                    update_progress(80, "RPC 상태 업데이트 중...")
+                    RPC.update(state=line[1], details=line[2], buttons=[{"label": line[6], "url": line[7]}, {"label": line[8], "url": line[9]}])
                 else:
-                    print(RPC.update(state=line[1], details=line[2], large_image=line[3], large_text=line[4], buttons=[{"label": line[6], "url": line[7]}, {"label": line[8], "url": line[9]}]))
+                    update_progress(80, "RPC 상태 업데이트 중...")
+                    RPC.update(state=line[1], details=line[2], large_image=line[3], large_text=line[4], buttons=[{"label": line[6], "url": line[7]}, {"label": line[8], "url": line[9]}])
             else:
+                time.sleep(0.1)
+                update_progress(60, "RPC 상태 업데이트 중...")
                 if line[3] == "":
-                    print(RPC.update(state=line[1], details=line[2]))
+                    update_progress(80, "RPC 상태 업데이트 중...")
+                    RPC.update(state=line[1], details=line[2])
                 else:
-                    print(RPC.update(state=line[1], details=line[2], large_image=line[3], large_text=line[4]))
-
+                    update_progress(80, "RPC 상태 업데이트 중...")
+                    RPC.update(state=line[1], details=line[2], large_image=line[3], large_text=line[4])
+                    
+            time.sleep(0.4)
+                    
+            update_progress(100, "완료!")
+            QTimer.singleShot(500, loading_dialog.close)  # 0.5초 후 로딩 창 닫기
             self.show_message("알림", "Discord RPC가 시작되었습니다")
             
         except Exception as e:
