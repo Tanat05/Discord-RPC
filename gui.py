@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QPushButton, QMessageBox, QFormLayout, QSpacerItem, QSizePolicy)
 from PyQt5.QtGui import QFont, QColor, QPalette
 from PyQt5.QtCore import Qt
+from pypresence import Presence
+import os
 
 class TossStyleApp(QMainWindow):
     def __init__(self):
@@ -108,6 +110,16 @@ class TossStyleApp(QMainWindow):
         button_url1 = self.fields["버튼1 URL"].text()
         button_name2 = self.fields["버튼2 제목"].text()
         button_url2 = self.fields["버튼2 URL"].text()
+        
+        if button_count == 0 and button_name1 != "" and button_url1 != "":
+            self.show_message("주의", "버튼 개수 0을 선택하였습니다.\n버튼1 제목,URL의 내용은 무시됩니다.")
+        elif button_count == 0 and (button_name2 != "" or button_url2 != ""):
+            self.show_message("주의", "버튼 개수 0을 선택하였습니다.\n버튼2 제목,URL의 내용은 무시됩니다.")
+        elif button_count == 0 and (button_name1 != "" or button_url1 != "") and (button_name2 != "" or button_url2 != ""):
+            self.show_message("주의", "버튼 개수 0을 선택하였습니다.\n버튼1,2 제목,URL의 내용은 무시됩니다.")
+        elif button_count == 1 and (button_name2 != "" or button_url2 != ""):
+            self.show_message("주의", "버튼 개수 1을 선택하였습니다.\n버튼2 제목,URL의 내용은 무시됩니다.")
+        
 
         if not all([client_id, state, details]):
             self.show_message("오류", "빈칸이 있습니다")
@@ -121,19 +133,40 @@ class TossStyleApp(QMainWindow):
             self.show_message("오류", "버튼 개수 2를 선택하였습니다\n버튼1 제목,URL 와 버튼2 제목,URL을 입력하셔야 합니다")
             return
 
-        with open("discord_rpc.txt", 'w') as f:
+        
+        with open("discord_rpc.txt", 'w', encoding="utf-8") as f:
             f.write(f"{client_id},{state},{details},{large_image},{large_text},{button_count},{button_name1},{button_url1},{button_name2},{button_url2}")
 
         self.show_message("알림", "업데이트가 완료되었습니다")
 
     def start(self):
         try:
-            with open("discord_rpc.txt", 'r') as f:
+            with open("discord_rpc.txt", 'r', encoding="utf-8") as f:
                 line = f.readline().split(",")
 
+            client_id = line[0]  # Fake ID, put your real one here
+            RPC = Presence(client_id)  # Initialize the client class
+            RPC.connect()
+            
+            if line[5] == '1':
+                if line[3] == "":
+                    print(RPC.update(state=line[1], details=line[2], buttons=[{"label": line[6], "url": line[7]}]))
+                else:
+                    print(RPC.update(state=line[1], details=line[2], large_image=line[3], large_text=line[4], buttons=[{"label": line[6], "url": line[7]}]))
+            elif line[5] == '2':
+                if line[3] == "":
+                    print(RPC.update(state=line[1], details=line[2], buttons=[{"label": line[6], "url": line[7]}, {"label": line[8], "url": line[9]}]))
+                else:
+                    print(RPC.update(state=line[1], details=line[2], large_image=line[3], large_text=line[4], buttons=[{"label": line[6], "url": line[7]}, {"label": line[8], "url": line[9]}]))
+            else:
+                if line[3] == "":
+                    print(RPC.update(state=line[1], details=line[2]))
+                else:
+                    print(RPC.update(state=line[1], details=line[2], large_image=line[3], large_text=line[4]))
             # Here you would typically start the Discord RPC
             # For demonstration, we'll just show a success message
             self.show_message("알림", "Discord RPC가 시작되었습니다")
+            
         except Exception as e:
             self.show_message("오류", f"실행에 실패했습니다: {str(e)}")
 
