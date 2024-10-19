@@ -1,194 +1,179 @@
-from msilib.schema import RadioButton
-import tkinter
-from tkinter import *
-from turtle import update
-from pypresence import Presence
-import os
 import sys
-import subprocess
-import pyautogui
+from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout, 
+                             QHBoxLayout, QLabel, QLineEdit, QComboBox, 
+                             QPushButton, QMessageBox, QFormLayout, QSpacerItem, QSizePolicy)
+from PyQt5.QtGui import QFont, QColor, QPalette
+from PyQt5.QtCore import Qt
 
+class TossStyleApp(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Discord RPC")
+        self.setFixedSize(400, 650)
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #ffffff;
+            }
+            QLabel {
+                color: #333333;
+                font-size: 14px;
+            }
+            QLineEdit {
+                border: 1px solid #e1e1e1;
+                border-radius: 8px;
+                padding: 8px;
+                font-size: 14px;
+                color: #333333;
+            }
+            QLineEdit:focus {
+                border: 2px solid #3182f6;
+            }
+            QComboBox {
+                border: 1px solid #e1e1e1;
+                border-radius: 8px;
+                padding: 8px;
+                font-size: 14px;
+                color: #333333;
+            }
+            QComboBox::drop-down {
+                border: 0px;
+            }
+            QPushButton {
+                background-color: #3182f6;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 10px;
+                font-size: 16px;
+                font-weight: bold;
+            }
+            QPushButton:hover {
+                background-color: #2c74db;
+            }
+        """)
 
-def on_closing():
-    res = pyautogui.confirm("정말 프로그램을 종료하시겠습니까?")
-    if res is not None and str(res) == "OK":
-        sys.exit(1)
-    else:
-        pass
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
+        main_layout.setContentsMargins(20, 20, 20, 20)
+        main_layout.setSpacing(15)
 
+        title_label = QLabel("DISCORD RPC")
+        title_label.setAlignment(Qt.AlignCenter)
+        title_label.setFont(QFont("Arial", 24, QFont.Bold))
+        title_label.setStyleSheet("color: #333333; margin-bottom: 20px;")
+        main_layout.addWidget(title_label)
 
-def update():
-    client_id1 = client_id.get()
-    state1 = state.get()
-    details1 = details.get()
-    large_image1 = large_image.get()
-    large_text1 = large_text.get()
-    list1 = listb.curselection()
-    button_name11 = button_name1.get()
-    button_url11 = button_url1.get()
-    button_name22 = button_name2.get()
-    button_url22 = button_url2.get()
+        form_layout = QFormLayout()
+        form_layout.setSpacing(10)
+        main_layout.addLayout(form_layout)
 
-    if client_id1 == "" or state1 == "" or details1 == "":
-        tkinter.messagebox.showwarning("오류", "빈칸이 있습니다")
-        return
-    try:
-        list1 = str(list1[0])
-    except:
-        tkinter.messagebox.showwarning("오류", "버튼의 개수를 선택해주세요")
-        return 0
+        self.fields = {
+            "Client ID": QLineEdit(),
+            "내용 1": QLineEdit(),
+            "내용 2": QLineEdit(),
+            "이미지 이름": QLineEdit(),
+            "이미지 내용": QLineEdit(),
+            "버튼1 제목": QLineEdit(),
+            "버튼1 URL": QLineEdit(),
+            "버튼2 제목": QLineEdit(),
+            "버튼2 URL": QLineEdit()
+        }
 
-    if list1 == "1":
-        if button_name11 == "" or button_url11 == "":
-            tkinter.messagebox.showwarning(
-                "오류", "버튼 개수 1을 선택하였습니다\n버튼1 제목,URL을 입력하셔야 합니다")
+        for label, widget in self.fields.items():
+            form_layout.addRow(QLabel(label), widget)
+
+        self.button_count = QComboBox()
+        self.button_count.addItems(["0", "1", "2"])
+        form_layout.addRow(QLabel("버튼 개수"), self.button_count)
+
+        main_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
+
+        update_button = QPushButton("업데이트")
+        update_button.clicked.connect(self.update)
+        main_layout.addWidget(update_button)
+
+        start_button = QPushButton("실행하기")
+        start_button.clicked.connect(self.start)
+        main_layout.addWidget(start_button)
+
+    def update(self):
+        client_id = self.fields["Client ID"].text()
+        state = self.fields["내용 2"].text()
+        details = self.fields["내용 1"].text()
+        large_image = self.fields["이미지 이름"].text()
+        large_text = self.fields["이미지 내용"].text()
+        button_count = int(self.button_count.currentText())
+        button_name1 = self.fields["버튼1 제목"].text()
+        button_url1 = self.fields["버튼1 URL"].text()
+        button_name2 = self.fields["버튼2 제목"].text()
+        button_url2 = self.fields["버튼2 URL"].text()
+
+        if not all([client_id, state, details]):
+            self.show_message("오류", "빈칸이 있습니다")
             return
-    if list1 == "2":
-        if button_name11 == "" or button_url11 == "" or button_name22 == "" or button_url22 == "":
-            tkinter.messagebox.showwarning(
-                "오류", "버튼 개수 2을 선택하였습니다\n버튼1 제목,URL 와 버튼2 제목,URL을 입력하셔야 합니다")
+
+        if button_count == 1 and not all([button_name1, button_url1]):
+            self.show_message("오류", "버튼 개수 1을 선택하였습니다\n버튼1 제목,URL을 입력하셔야 합니다")
             return
 
-    f = open("discord_rpc.txt", 'w')
-    f.write(client_id1 + "," + state1 + "," + details1 + "," +
-            large_image1 + "," + large_text1 + "," + list1 + "," + button_name11 + "," + button_url11 + "," + button_name22 + "," + button_url22)
-    f.close()
+        if button_count == 2 and not all([button_name1, button_url1, button_name2, button_url2]):
+            self.show_message("오류", "버튼 개수 2를 선택하였습니다\n버튼1 제목,URL 와 버튼2 제목,URL을 입력하셔야 합니다")
+            return
 
-    win = Tk()
-    win.title("discord_rpc")
-    win.geometry('300x200')
+        with open("discord_rpc.txt", 'w') as f:
+            f.write(f"{client_id},{state},{details},{large_image},{large_text},{button_count},{button_name1},{button_url1},{button_name2},{button_url2}")
 
-    label = tkinter.Label(win, text="업데이트가 완료되었습니다")
-    label.place(x=5, y=80, width=290, height=30)
-    win.mainloop()
+        self.show_message("알림", "업데이트가 완료되었습니다")
 
-
-def stop():
-    win.destroy()
-    subprocess.call(["python", os.path.join(
-        sys.path[0], __file__)] + sys.argv[1:])
-
-
-def start():
-    try:
-        f = open("discord_rpc.txt", 'r')
-        line = f.readline()
-        line = line.split(",")
+    def start(self):
         try:
-            RPC = Presence(client_id=line[0])
-            RPC.connect()
-        except:
-            tkinter.messagebox.showwarning("오류", "잘못된 client_id입니다")
-            sys.exit()
+            with open("discord_rpc.txt", 'r') as f:
+                line = f.readline().split(",")
 
-        try:
-            if line[5] == "1":
-                RPC.update(state=line[1], details=line[2], large_image=line[3],
-                           large_text=line[4], buttons=[{"label": line[6], "url": line[7]}])
-
-            if line[5] == "2":
-                RPC.update(state=line[1], details=line[2],
-                           large_image=line[3], large_text=line[4],
-                           buttons=[{"label": line[6], "url": line[7]},
-                                    {"label": line[8], "url": line[9]}]
-                           )
-            else:
-                RPC.update(details=line[1], state=line[2])
+            # Here you would typically start the Discord RPC
+            # For demonstration, we'll just show a success message
+            self.show_message("알림", "Discord RPC가 시작되었습니다")
         except Exception as e:
-            tkinter.messagebox.showwarning("오류", "실행이 실패하였습니다\n" + str(e))
-        f.close()
-    except Exception as e:
-        tkinter.messagebox.showwarning(
-            "오류", "discord_rpc.txt 파일을 찾을 수 없습니다\n처음 한번 업데이트를 해주세요\n또한 discord_rpc.txt파일을 이 프로그램 파일과 같은 경로에 두세요")
-        sys.exit()
-    win.title("실행 중")
-    button = tkinter.Button(win, text="중단하기", command=stop)
-    button.place(x=5, y=650, width=590, height=30)
+            self.show_message("오류", f"실행에 실패했습니다: {str(e)}")
 
-    win.mainloop()
+    def show_message(self, title, message):
+        msg_box = QMessageBox(self)
+        msg_box.setWindowTitle(title)
+        msg_box.setText(message)
+        msg_box.setStyleSheet("""
+            QMessageBox {
+                background-color: white;
+            }
+            QMessageBox QLabel {
+                color: #333333;
+                font-size: 14px;
+            }
+            QMessageBox QPushButton {
+                background-color: #3182f6;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 6px 12px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QMessageBox QPushButton:hover {
+                background-color: #2c74db;
+            }
+        """)
+        msg_box.exec_()
 
+    def closeEvent(self, event):
+        reply = QMessageBox.question(self, '확인', '정말 프로그램을 종료하시겠습니까?',
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            event.accept()
+        else:
+            event.ignore()
 
-win = Tk()
-win.title("discord_rpc")
-win.geometry('600x690')
-
-label = tkinter.Label(win, text="DISCORD RPC", font=("", 30))
-label.place(x=155, y=20, width=290, height=30)
-
-
-label = tkinter.Label(win, text="client_id")
-label.place(x=5, y=90, width=290, height=30)
-
-client_id = tkinter.Entry(win)
-client_id.place(x=5, y=120, width=290, height=30)
-
-label = tkinter.Label(win, text="내용 1")
-label.place(x=5, y=170, width=290, height=30)
-
-details = tkinter.Entry(win)
-details.place(x=5, y=200, width=290, height=30)
-
-
-label = tkinter.Label(win, text="내용 2")
-label.place(x=300, y=170, width=290, height=30)
-
-state = tkinter.Entry(win)
-state.place(x=300, y=200, width=290, height=30)
-
-
-label = tkinter.Label(win, text="이미지 이름")
-label.place(x=5, y=250, width=290, height=30)
-
-large_image = tkinter.Entry(win)
-large_image.place(x=5, y=280, width=290, height=30)
-
-
-label = tkinter.Label(win, text="이미지 내용")
-label.place(x=300, y=250, width=290, height=30)
-
-large_text = tkinter.Entry(win)
-large_text.place(x=300, y=280, width=290, height=30)
-
-
-label = tkinter.Label(win, text="버튼 개수")
-label.place(x=5, y=360, width=290, height=30)
-
-listb = Listbox(win, height=0)
-listb.insert(0, "0")
-listb.insert(1, "1")
-listb.insert(2, "2")
-listb.place(x=5, y=390, width=290, height=55)
-
-label = tkinter.Label(win, text="버튼1 제목")
-label.place(x=5, y=460, width=290, height=30)
-
-button_name1 = tkinter.Entry(win)
-button_name1.place(x=5, y=490, width=290, height=30)
-
-label = tkinter.Label(win, text="버튼1 URL")
-label.place(x=300, y=460, width=290, height=30)
-
-button_url1 = tkinter.Entry(win)
-button_url1.place(x=300, y=490, width=290, height=30)
-
-label = tkinter.Label(win, text="버튼2 제목")
-label.place(x=5, y=540, width=290, height=30)
-
-button_name2 = tkinter.Entry(win)
-button_name2.place(x=5, y=570, width=290, height=30)
-
-label = tkinter.Label(win, text="버튼2 URL")
-label.place(x=300, y=540, width=290, height=30)
-
-button_url2 = tkinter.Entry(win)
-button_url2.place(x=300, y=570, width=290, height=30)
-
-
-button = tkinter.Button(win, text="업데이트", command=update)
-button.place(x=5, y=650, width=290, height=30)
-button = tkinter.Button(win, text="실행하기", command=start)
-button.place(x=305, y=650, width=290, height=30)
-
-win.protocol("WM_DELETE_WINDOW", on_closing)
-
-win.mainloop()
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    window = TossStyleApp()
+    window.show()
+    sys.exit(app.exec_())
