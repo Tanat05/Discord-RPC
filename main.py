@@ -128,7 +128,7 @@ class TossStyleApp(QMainWindow):
 
         main_layout.addItem(QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding))
 
-        update_button = QPushButton("업데이트")
+        update_button = QPushButton("저장하기")
         update_button.clicked.connect(self.update)
         main_layout.addWidget(update_button)
 
@@ -149,40 +149,54 @@ class TossStyleApp(QMainWindow):
         button_url2 = self.fields["버튼2 URL"].text()
         
         if button_count == 0 and button_name1 != "" and button_url1 != "":
-            self.show_message("주의", "버튼 개수 0을 선택하였습니다.\n버튼1 제목,URL의 내용은 무시됩니다.")
+            self.show_warning("주의", "버튼 개수 0을 선택하였습니다.\n버튼1 제목,URL의 내용은 무시됩니다.")
         elif button_count == 0 and (button_name2 != "" or button_url2 != ""):
-            self.show_message("주의", "버튼 개수 0을 선택하였습니다.\n버튼2 제목,URL의 내용은 무시됩니다.")
+            self.show_warning("주의", "버튼 개수 0을 선택하였습니다.\n버튼2 제목,URL의 내용은 무시됩니다.")
         elif button_count == 0 and (button_name1 != "" or button_url1 != "") and (button_name2 != "" or button_url2 != ""):
-            self.show_message("주의", "버튼 개수 0을 선택하였습니다.\n버튼1,2 제목,URL의 내용은 무시됩니다.")
+            self.show_warning("주의", "버튼 개수 0을 선택하였습니다.\n버튼1,2 제목,URL의 내용은 무시됩니다.")
         elif button_count == 1 and (button_name2 != "" or button_url2 != ""):
-            self.show_message("주의", "버튼 개수 1을 선택하였습니다.\n버튼2 제목,URL의 내용은 무시됩니다.")
+            self.show_warning("주의", "버튼 개수 1을 선택하였습니다.\n버튼2 제목,URL의 내용은 무시됩니다.")
         
 
         if not all([client_id, state, details]):
-            self.show_message("오류", "빈칸이 있습니다")
+            self.show_error("오류", "빈칸이 있습니다")
             return
 
         if button_count == 1 and not all([button_name1, button_url1]):
-            self.show_message("오류", "버튼 개수 1을 선택하였습니다\n버튼1 제목,URL을 입력하셔야 합니다")
+            self.show_error("오류", "버튼 개수 1을 선택하였습니다\n버튼1 제목,URL을 입력하셔야 합니다")
             return
 
         if button_count == 2 and not all([button_name1, button_url1, button_name2, button_url2]):
-            self.show_message("오류", "버튼 개수 2를 선택하였습니다\n버튼1 제목,URL 와 버튼2 제목,URL을 입력하셔야 합니다")
+            self.show_error("오류", "버튼 개수 2를 선택하였습니다\n버튼1 제목,URL 와 버튼2 제목,URL을 입력하셔야 합니다")
             return
 
         
         with open(f"{tempfile.gettempdir()}\\discord_rpc.txt", 'w', encoding="utf-8") as f:
             f.write(f"{client_id},{state},{details},{large_image},{large_text},{button_count},{button_name1},{button_url1},{button_name2},{button_url2}")
 
-        self.show_message("알림", "업데이트가 완료되었습니다")
+        self.show_message("알림", "저장 완료되었습니다")
 
     def start(self):
         try:
             with open(f"{tempfile.gettempdir()}\\discord_rpc.txt", 'r', encoding="utf-8") as f:
                 line = f.readline().split(",")
+                
+            client_id = self.fields["Client ID"].text()
+            state = self.fields["내용 2"].text()
+            details = self.fields["내용 1"].text()
+            large_image = self.fields["이미지 이름"].text()
+            large_text = self.fields["이미지 내용"].text()
+            button_count = int(self.button_count.currentText())
+            button_name1 = self.fields["버튼1 제목"].text()
+            button_url1 = self.fields["버튼1 URL"].text()
+            button_name2 = self.fields["버튼2 제목"].text()
+            button_url2 = self.fields["버튼2 URL"].text()
+            
+            if line[0] != client_id or line[1] != state or line[2] != details or line[3] != large_image or line[4] != large_text or line[5] != str(button_count) or line[6] != button_name1 or line[7] != button_url1 or line[8] != button_name2 or line[9] != button_url2:
+                self.show_warning("주의", "변경된 내용이 있습니다.\n저장하기를 해야 반영이 됩니다.")
 
-            client_id = line[0]  # Fake ID, put your real one here
-            RPC = Presence(client_id)  # Initialize the client class
+            client_id = line[0]
+            RPC = Presence(client_id)
             RPC.connect()
             
             if line[5] == '1':
@@ -200,15 +214,70 @@ class TossStyleApp(QMainWindow):
                     print(RPC.update(state=line[1], details=line[2]))
                 else:
                     print(RPC.update(state=line[1], details=line[2], large_image=line[3], large_text=line[4]))
-            # Here you would typically start the Discord RPC
-            # For demonstration, we'll just show a success message
+
             self.show_message("알림", "Discord RPC가 시작되었습니다")
             
         except Exception as e:
-            self.show_message("오류", f"실행에 실패했습니다: {str(e)}")
+            self.show_error("오류", f"실행에 실패했습니다: {str(e)}")
 
     def show_message(self, title, message):
         msg_box = QMessageBox(self)
+        msg_box.setWindowTitle(title)
+        msg_box.setText(message)
+        msg_box.setStyleSheet("""
+            QMessageBox {
+                background-color: white;
+            }
+            QMessageBox QLabel {
+                color: #333333;
+                font-size: 14px;
+            }
+            QMessageBox QPushButton {
+                background-color: #3182f6;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 6px 12px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QMessageBox QPushButton:hover {
+                background-color: #2c74db;
+            }
+        """)
+        msg_box.exec_()
+        
+    def show_warning(self, title, message):
+        msg_box = QMessageBox(self)
+        msg_box.setIcon(QMessageBox.Warning)
+        msg_box.setWindowTitle(title)
+        msg_box.setText(message)
+        msg_box.setStyleSheet("""
+            QMessageBox {
+                background-color: white;
+            }
+            QMessageBox QLabel {
+                color: #333333;
+                font-size: 14px;
+            }
+            QMessageBox QPushButton {
+                background-color: #3182f6;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 6px 12px;
+                font-size: 14px;
+                font-weight: bold;
+            }
+            QMessageBox QPushButton:hover {
+                background-color: #2c74db;
+            }
+        """)
+        msg_box.exec_()
+
+    def show_error(self, title, message):
+        msg_box = QMessageBox(self)
+        msg_box.setIcon(QMessageBox.Critical)
         msg_box.setWindowTitle(title)
         msg_box.setText(message)
         msg_box.setStyleSheet("""
