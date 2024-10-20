@@ -5,7 +5,7 @@
 
 누구나 쉽게 사용가능한 Discord RPC입니다.
 
-[Download]([https://drive.google.com/file/d/14oS7MIGk5-VK6rcziUyhM5qCIwiqZt3i/view?usp=sharing](https://drive.google.com/file/d/14BVZ5R6Hg1RQsbLT63yu_hcrdxO9Ju_L/view?usp=sharing))
+[Download](https://drive.google.com/file/d/14BVZ5R6Hg1RQsbLT63yu_hcrdxO9Ju_L/view?usp=sharing)
 
 ![image](https://github.com/user-attachments/assets/2c0b1b51-e2d6-4382-8fb1-83d976b50c0a)
 
