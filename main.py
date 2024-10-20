@@ -145,12 +145,12 @@ class TossStyleApp(QMainWindow):
 
         try:
                 with open(f"{tempfile.gettempdir()}\\discord_rpc_1.txt", 'r', encoding="utf-8") as f:
-                        line = f.readline().split(",")
+                        line = f.readline().split(";")
                         
                 self.fields = {
                     "Client ID": QLineEdit(line[0]),
-                    "내용 1": QLineEdit(line[1]),
-                    "내용 2": QLineEdit(line[2]),
+                    "내용 1": QLineEdit(line[2]),
+                    "내용 2": QLineEdit(line[1]),
                     "이미지 이름": QLineEdit(line[3]),
                     "이미지 내용": QLineEdit(line[4]),
                     "버튼1 제목": QLineEdit(line[6]),
@@ -201,11 +201,15 @@ class TossStyleApp(QMainWindow):
 
         try:
             with open(file_path, 'r', encoding="utf-8") as f:
-                line = f.readline().split(",")
+                line = f.readline().split(";")
             
             for i, (key, widget) in enumerate(self.fields.items()):
                 if i < len(line) and i >= 5:
                     widget.setText(line[i+1])
+                elif i < len(line) and i == 1:
+                    widget.setText(line[i+1])
+                elif i < len(line) and i == 2:
+                    widget.setText(line[i-1])
                 elif i < len(line):
                     widget.setText(line[i])
                 else:
@@ -257,7 +261,7 @@ class TossStyleApp(QMainWindow):
 
         
         with open(f"{tempfile.gettempdir()}\\discord_rpc_{file_number}.txt", 'w', encoding="utf-8") as f:
-            f.write(f"{client_id},{state},{details},{large_image},{large_text},{button_count},{button_name1},{button_url1},{button_name2},{button_url2}")
+            f.write(f"{client_id};{state};{details};{large_image};{large_text};{button_count};{button_name1};{button_url1};{button_name2};{button_url2}")
 
         self.show_message("알림", "저장 완료되었습니다")
 
@@ -275,7 +279,7 @@ class TossStyleApp(QMainWindow):
 
             update_progress(2, "설정 파일 읽는 중...")
             with open(f"{tempfile.gettempdir()}\\discord_rpc_{file_number}.txt", 'r', encoding="utf-8") as f:
-                line = f.readline().split(",")
+                line = f.readline().split(";")
 
             update_progress(4, "Discord RPC 연결 중...")
             time.sleep(0.1)
