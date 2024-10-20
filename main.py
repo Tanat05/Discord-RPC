@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (QApplication, QMainWindow, QWidget, QVBoxLayout,
                              QHBoxLayout, QLabel, QLineEdit, QComboBox, 
                              QPushButton, QMessageBox, QFormLayout, QSpacerItem, QSizePolicy,
                              QDialog, QProgressBar)
-from PyQt5.QtGui import QFont, QFontDatabase
+from PyQt5.QtGui import QFont, QFontDatabase, QIcon, QPixmap
 from PyQt5.QtCore import Qt, QTimer
 from pypresence import Presence
 import tempfile
@@ -14,6 +14,9 @@ class LoadingDialog(QDialog):
     def __init__(self, parent=None):
         super().__init__(parent)
         self.setWindowTitle("로딩 중...")
+        pixmap = QPixmap(1, 1)
+        pixmap.fill(Qt.transparent)
+        self.setWindowIcon(QIcon(pixmap))
         self.setFixedSize(300, 100)
         layout = QVBoxLayout(self)
 
@@ -52,6 +55,9 @@ class TossStyleApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Discord RPC")
+        pixmap = QPixmap(1, 1)
+        pixmap.fill(Qt.transparent)
+        self.setWindowIcon(QIcon(pixmap))
         self.setFixedSize(500, 750)
         self.setStyleSheet("""
             * {
@@ -322,6 +328,9 @@ class TossStyleApp(QMainWindow):
     def show_message(self, title, message):
         msg_box = QMessageBox(self)
         msg_box.setWindowTitle(title)
+        pixmap = QPixmap(1, 1)
+        pixmap.fill(Qt.transparent)
+        self.setWindowIcon(QIcon(pixmap))
         msg_box.setText(message)
         msg_box.setStyleSheet("""
             QMessageBox {
@@ -349,6 +358,9 @@ class TossStyleApp(QMainWindow):
     def show_warning(self, title, message):
         msg_box = QMessageBox(self)
         msg_box.setIcon(QMessageBox.Warning)
+        pixmap = QPixmap(1, 1)
+        pixmap.fill(Qt.transparent)
+        self.setWindowIcon(QIcon(pixmap))
         msg_box.setWindowTitle(title)
         msg_box.setText(message)
         msg_box.setStyleSheet("""
@@ -378,6 +390,9 @@ class TossStyleApp(QMainWindow):
         msg_box = QMessageBox(self)
         msg_box.setIcon(QMessageBox.Critical)
         msg_box.setWindowTitle(title)
+        pixmap = QPixmap(1, 1)
+        pixmap.fill(Qt.transparent)
+        self.setWindowIcon(QIcon(pixmap))
         msg_box.setText(message)
         msg_box.setStyleSheet("""
             QMessageBox {
