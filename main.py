@@ -204,7 +204,9 @@ class TossStyleApp(QMainWindow):
                 line = f.readline().split(",")
             
             for i, (key, widget) in enumerate(self.fields.items()):
-                if i < len(line):
+                if i < len(line) and i >= 5:
+                    widget.setText(line[i+1])
+                elif i < len(line):
                     widget.setText(line[i])
                 else:
                     widget.setText("")
