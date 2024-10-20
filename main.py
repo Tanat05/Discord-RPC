@@ -210,7 +210,7 @@ class TossStyleApp(QMainWindow):
                     widget.setText("")
             
             try:
-                self.button_count.setCurrentText(line[9])
+                self.button_count.setCurrentText(line[5])
             except:
                 self.button_count.setCurrentText("0")
             
