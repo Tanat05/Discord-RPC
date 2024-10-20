@@ -52,7 +52,7 @@ class TossStyleApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Discord RPC")
-        self.setFixedSize(500, 700)
+        self.setFixedSize(500, 750)
         self.setStyleSheet("""
             * {
                 font-weight: bold;
@@ -63,7 +63,6 @@ class TossStyleApp(QMainWindow):
             QLabel {
                 padding: 8px;
                 color: #333333;
-                font-size: 14px;
             }
             QLineEdit {
                 border: 1px solid #e1e1e1;
@@ -128,21 +127,14 @@ class TossStyleApp(QMainWindow):
         form_layout.setSpacing(10)
         main_layout.addLayout(form_layout)
         
-        file_layout = QHBoxLayout()
         self.file_number = QComboBox()
         self.file_number.addItems([str(i) for i in range(1, 11)])
-        file_layout.addWidget(QLabel("파일 번호:"))
+        file_layout = QHBoxLayout()
         file_layout.addWidget(self.file_number)
-        
         load_button = QPushButton("불러오기")
         load_button.clicked.connect(self.load_file)
         file_layout.addWidget(load_button)
-        
-        main_layout.addLayout(file_layout)
-
-        form_layout = QFormLayout()
-        form_layout.setSpacing(10)
-        main_layout.addLayout(form_layout)
+        form_layout.addRow(QLabel("파일 번호"), file_layout)
         
 
         try:
