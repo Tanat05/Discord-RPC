@@ -27,7 +27,7 @@ class LoadingDialog(QDialog):
 
         self.setStyleSheet("""
             QDialog {
-                background-color: white;
+                background-color: #fafafa;
             }
             QProgressBar {
                 border: 2px solid #3182f6;
@@ -38,7 +38,7 @@ class LoadingDialog(QDialog):
                 background-color: #3182f6;
             }
             QLabel {
-                color: #333333;
+                color: #444444;
                 font-size: 14px;
             }
         """)
@@ -58,18 +58,18 @@ class TossStyleApp(QMainWindow):
                 font-weight: bold;
             }              
             QMainWindow {
-                background-color: #ffffff;
+                background-color: #fafafa;
             }
             QLabel {
                 padding: 8px;
-                color: #333333;
+                color: #444444;
             }
             QLineEdit {
                 border: 1px solid #e1e1e1;
                 border-radius: 8px;
                 padding: 8px;
                 font-size: 16px;
-                color: #333333;
+                color: #444444;
                 font-weight: normal;
             }
             QLineEdit:focus {
@@ -80,7 +80,7 @@ class TossStyleApp(QMainWindow):
                 border-radius: 8px;
                 padding: 8px;
                 font-size: 14px;
-                color: #333333;
+                color: #444444;
                 background-color: white;
             }
             QComboBox::drop-down {
@@ -99,7 +99,7 @@ class TossStyleApp(QMainWindow):
             }
             QPushButton {
                 background-color: #3182f6;
-                color: white;
+                color: #fafafa;
                 border: none;
                 border-radius: 8px;
                 padding: 10px;
@@ -120,7 +120,7 @@ class TossStyleApp(QMainWindow):
         title_label = QLabel("DISCORD RPC")
         title_label.setAlignment(Qt.AlignCenter)
         title_label.setFont(QFont("Arial", 24, QFont.Bold))
-        title_label.setStyleSheet("color: #333333; margin-bottom: 20px;")
+        title_label.setStyleSheet("color: #444444; margin-bottom: 20px;")
         main_layout.addWidget(title_label)
 
         form_layout = QFormLayout()
