@@ -12,6 +12,9 @@
 
 # 사용법
 ## 1. 내용 채우기
+
+> 주의 `;` 입력 금지
+
 Client ID*: [디스코드 개발자 포털](https://discord.com/developers/applications)에 접속해 애플리케이션 생성 후 Application ID 붙여넣기
 
 내용*: 원하는 내용 입력
