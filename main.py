@@ -52,7 +52,7 @@ class TossStyleApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Discord RPC")
-        self.setFixedSize(500, 650)
+        self.setFixedSize(500, 700)
         self.setStyleSheet("""
             * {
                 font-weight: bold;
@@ -127,9 +127,26 @@ class TossStyleApp(QMainWindow):
         form_layout = QFormLayout()
         form_layout.setSpacing(10)
         main_layout.addLayout(form_layout)
+        
+        file_layout = QHBoxLayout()
+        self.file_number = QComboBox()
+        self.file_number.addItems([str(i) for i in range(1, 11)])
+        file_layout.addWidget(QLabel("파일 번호:"))
+        file_layout.addWidget(self.file_number)
+        
+        load_button = QPushButton("불러오기")
+        load_button.clicked.connect(self.load_file)
+        file_layout.addWidget(load_button)
+        
+        main_layout.addLayout(file_layout)
+
+        form_layout = QFormLayout()
+        form_layout.setSpacing(10)
+        main_layout.addLayout(form_layout)
+        
 
         try:
-                with open(f"{tempfile.gettempdir()}\\discord_rpc.txt", 'r', encoding="utf-8") as f:
+                with open(f"{tempfile.gettempdir()}\\discord_rpc_1.txt", 'r', encoding="utf-8") as f:
                         line = f.readline().split(",")
                         
                 self.fields = {
@@ -175,8 +192,36 @@ class TossStyleApp(QMainWindow):
         start_button = QPushButton("실행하기")
         start_button.clicked.connect(self.start)
         main_layout.addWidget(start_button)
+        
+    def load_file(self):
+        file_number = self.file_number.currentText()
+        file_path = f"{tempfile.gettempdir()}\\discord_rpc_{file_number}.txt"
+        
+        if not os.path.exists(file_path):
+            self.show_error("오류", f"파일 {file_number}이(가) 존재하지 않습니다.")
+            return
+
+        try:
+            with open(file_path, 'r', encoding="utf-8") as f:
+                line = f.readline().split(",")
+            
+            for i, (key, widget) in enumerate(self.fields.items()):
+                if i < len(line):
+                    widget.setText(line[i])
+                else:
+                    widget.setText("")
+            
+            try:
+                self.button_count.setCurrentText(line[9])
+            except:
+                self.button_count.setCurrentText("0")
+            
+            self.show_message("알림", f"파일 {file_number}번에서 설정을 불러왔습니다.")
+        except Exception as e:
+            self.show_error("오류", f"파일 {file_number}번을 불러오는 중 오류가 발생했습니다: {str(e)}")
 
     def update(self):
+        file_number = self.file_number.currentText()
         client_id = self.fields["Client ID"].text()
         state = self.fields["내용 2"].text()
         details = self.fields["내용 1"].text()
@@ -211,7 +256,7 @@ class TossStyleApp(QMainWindow):
             return
 
         
-        with open(f"{tempfile.gettempdir()}\\discord_rpc.txt", 'w', encoding="utf-8") as f:
+        with open(f"{tempfile.gettempdir()}\\discord_rpc_{file_number}.txt", 'w', encoding="utf-8") as f:
             f.write(f"{client_id},{state},{details},{large_image},{large_text},{button_count},{button_name1},{button_url1},{button_name2},{button_url2}")
 
         self.show_message("알림", "저장 완료되었습니다")
@@ -224,9 +269,12 @@ class TossStyleApp(QMainWindow):
             def update_progress(value, status):
                 loading_dialog.update_progress(value, status)
                 QApplication.processEvents()
+            
+            update_progress(0, "설정 파일 불러오는 중...")
+            file_number = self.file_number.currentText()
 
-            update_progress(0, "설정 파일 읽는 중...")
-            with open(f"{tempfile.gettempdir()}\\discord_rpc.txt", 'r', encoding="utf-8") as f:
+            update_progress(2, "설정 파일 읽는 중...")
+            with open(f"{tempfile.gettempdir()}\\discord_rpc_{file_number}.txt", 'r', encoding="utf-8") as f:
                 line = f.readline().split(",")
 
             update_progress(4, "Discord RPC 연결 중...")
