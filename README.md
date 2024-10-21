@@ -7,7 +7,8 @@
 
 [Download](https://drive.google.com/file/d/1Du4iKeB6fOYLF-mEyk2iazy0IYdFxy2k/view?usp=sharing)
 
-![image](https://github.com/user-attachments/assets/2c0b1b51-e2d6-4382-8fb1-83d976b50c0a)
+![image](https://github.com/user-attachments/assets/25af69fb-629b-4ae8-ab04-9e6c1b860885)
+
 
 
 # 사용법
