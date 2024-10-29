@@ -34,9 +34,9 @@ Client ID*: [Discord Developer Portal] (https://discord.com/developers/applicati
 
 ## 2. Save and run
 
-Press Save button and run
+Press 저장하기(save) and 실행하기(run)
 
-If the Save button is not pressed, it will not be reflected
+If the 저장하기(save) button is not pressed, it will not be reflected
   
 
 # Maker
