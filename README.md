@@ -18,17 +18,17 @@ easy-to-use discord RPC
 
 Client ID*: [Discord Developer Portal] (https://discord.com/developers/applications) , create an application, paste the application ID)
 
-Content*: Enter what you want
+내용*: Enter what you want
 
-Image name: Rich Presence - The name of the image you added to Rich Presence Assets or the link between the gyphy and tenor sites, or the default image of the application when not entered
+이미지 이름: Rich Presence - The name of the image you added to Rich Presence Assets or the link between the gyphy and tenor sites, or the default image of the application when not entered
 
-Image content: What comes out when you mouse over the image
+이미지 내용: What comes out when you mouse over the image
 
-Button title: What will be displayed on the button
+버튼 제목: What will be displayed on the button
 
-Button URL: URL address to be moved when pressed
+버튼 URL: URL address to be moved when pressed
 
-Number of buttons*: Specify as many as you want
+버튼 개수*: Specify as many as you want
 
 *Mandatory Input
 
